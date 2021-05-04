@@ -2,13 +2,20 @@
 
 Dubon-Django-Blog is a Python/Django built 'simple blog app'.
 
-## Installation
+## Features
 
-TODO: Write installation
+- Sharing posts via email: When readers like an article, they might want to share it with somebody else. You will
+  implement the functionality to share posts via email.
 
-```bash
-pip install foobar
-```
+- Adding comments to a post: Many people want to allow their audience to comment on posts and create discussions. You
+  will let your readers add comments to your blog posts.
+
+- Tagging posts: Tags allow you to categorize content in a non-hierarchical manner, using simple keywords. You will
+implement a tagging system, which is a very popular feature for blogs.
+
+- Recommending similar posts: Once you have a classification method in place, such as a tagging system, you can use it
+  to provide content recommendations to your readers. You will build a system that recommends other posts that share
+  tags with a certain blog post.
 
 ## Usage
 
