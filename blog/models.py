@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 
 # Published custom post manager model
@@ -20,7 +21,8 @@ class Post(models.Model):
     title = models.CharField(max_length=250)
     # Use the slug field to build beautiful, SEO-friendly URLs for your blog posts
     # - added the unique_for_date parameter to this field so that you can build URLs for
-    # - posts using their publish date and slug
+    # - posts using their publish date and slug -> unique_for_date ensures there will be only one post
+    # - with a slug for a given date
     slug = models.SlugField(max_length=250, unique_for_date='publish')
     # Many-to-one relationship for author, meaning that each post is written by a user, and a user
     # - can write any number of posts
@@ -51,3 +53,16 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    # You will use the get_absolute_url() method in
+    # - your templates to link to specific posts.
+    def get_absolute_url(self):
+        return reverse(
+            'blog:post_detail',
+            args=[
+                self.publish.year,
+                self.publish.month,
+                self.publish.day,
+                self.slug,
+            ]
+        )
