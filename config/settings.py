@@ -114,3 +114,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# If you can't use an SMTP server, you can tell Django to write emails to the console.
+# - This is very useful for testing your application without an SMTP server.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Email
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'josephdubon@gmail.com'
+# EMAIL_HOST_PASSWORD = ''
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
