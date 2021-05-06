@@ -23,6 +23,20 @@
         </h2>
     {% endwith %}
 
+    {# Include list of similar posts. #}
+    <h2>
+        Similar Posts
+    </h2>
+    {% for post in similar_posts %}
+        <p>
+            <a href="{{ post.get_absolute_url }}">
+                {{ post.title }}
+            </a>
+        </p>
+    {% empty %}
+        There are currently no similar posts.
+    {% endfor %}
+
     {# Include a list of comments. #}
     {% for comment in comments %}
         <div class="comment">
