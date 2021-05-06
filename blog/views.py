@@ -2,25 +2,51 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
+from taggit.models import Tag
+from django.db.models import Count
 
 from .models import Post, Comment
 from .forms import EmailPostForm, CommentForm
 
 
 # List posts view
-class PostListView(ListView):
-    # Use a specific QuerySet instead of retrieving all objects.
-    # - Instead of defining a queryset attribute, you could have specified model = Post
-    # - and Django would have built the generic Post.objects.all() QuerySet for you.
-    queryset = Post.published.all()
-    # Use the context variable posts for the query results.
-    # - The default variable is object_list if you don't specify any context_object_name
-    context_object_name = 'posts'
-    # Paginate the result, displaying three objects per page.
-    paginate_by = 3
-    # Use a custom template to render the page. If you don't set a default
-    # template, ListView will use blog/post_list.html
-    template_name = 'blog/post/list.html'
+def post_list(request, tag_slug=None):
+    object_list = Post.published.all()
+    # Start tag with default value of None.
+    tag = None
+    # If there is a given tag slug, you get the Tag object with the given slug.
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        # Filter the posts by the ones that contain the given tag.
+        object_list = object_list.filter(tags__in=[tag])
+    # Instantiate the Paginator class with the number of
+    # objects that you want to display on each page.
+    paginator = Paginator(object_list, 3)
+    # Get the page GET parameter, which indicates the
+    # current page number.
+    page = request.GET.get('page')
+    # Obtain the objects for the desired page by
+    # calling the page() method of Paginator.
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        # If the page parameter is not an integer, you retrieve
+        # the first page of results.
+        posts = paginator.page(1)
+    except EmptyPage:
+        # If this parameter is a number higher than the last page
+        # of results, you retrieve the last page.
+        posts = paginator.page(paginator.num_pages)
+        # Pass the page number and retrieved objects to the template.
+    return render(
+        request,
+        'blog/post/list.html',
+        {
+            'page': page,
+            'posts': posts,
+            'tag': tag,
+        },
+    )
 
 
 # Detail post view
@@ -55,12 +81,27 @@ def post_detail(request, year, month, day, post):
     else:
         comment_form = CommentForm()
 
+    # List of similar posts based off tags.
+    # Retrieve a Python list of IDs for the tags of the current post.
+    # - ass flat=True to it to get single values such as
+    # - [1, 2, 3, ...] instead of one-tuples such as [(1,), (2,), (3,) ...].
+    post_tags_ids = post.tags.values_list('id', flat=True)
+    # Get all posts that contain any of these tags, excluding the current post itself.
+    similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(id=post.id)
+    # Use the Count aggregation function to generate a calculated field —same_tags— that
+    # - contains the number of tags shared with all the tags queried.
+    # - order the result by the number of shared tags (descending order) and by publish
+    # - to display recent posts first for the posts with the same number of shared tags.
+    # You slice the result to retrieve only the first four posts.
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', '-publish')[:4]
+
     return render(request,
                   'blog/post/detail.html', {
                       'post': post,
                       'comments': comments,
                       'new_comment': new_comment,
                       'comment_form': comment_form,
+                      'similar_posts': similar_posts,
                   }
                   )
 
