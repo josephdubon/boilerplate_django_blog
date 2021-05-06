@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'blog.apps.BlogConfig',  # Custom blog app
+
+    'taggit',  # Used for tags in post functionality
 ]
 
 MIDDLEWARE = [
