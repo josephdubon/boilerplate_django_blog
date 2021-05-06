@@ -14,4 +14,43 @@
         </a>
     </p>
 
+    {# Add the total comments. #}
+    {% with comments.count as total_comments %}
+        <h2>
+            {# The pluralize template filter returns a string with the letter "s" if the value #}
+            {# is different from 1. #}
+            {{ total_comments }} comment{{ total_comments|pluralize }}
+        </h2>
+    {% endwith %}
+
+    {# Include a list of comments. #}
+    {% for comment in comments %}
+        <div class="comment">
+            <p class="info">
+                {# enumerate comments with the {{ forloop.counter }} variable, which #}
+                {# -  contains the loop counter in each iteration. #}
+                Comment {{ forloop.counter }} by {{ comment.name }}
+                {{ comment.created }}
+            </p>
+            {{ comment.body|linebreaks }}
+        </div>
+    {% empty %}
+        <p>There are no comments yet.</p>
+    {% endfor %}
+
+    {# Render the form or display a success message if comment successfully submitted. #}
+    {% if new_comment %}
+        <h2>
+            Your comment has been added.
+        </h2>
+    {% else %}
+        <form method="POST">
+            {{ comment_form.as_p }}
+            {% csrf_token %}
+            <p>
+                <input type="submit" value="Add comment">
+            </p>
+        </form>
+    {% endif %}
+
 {% endblock %}
