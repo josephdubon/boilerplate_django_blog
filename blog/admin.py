@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post
+from .models import Post, Comment
 
 
 # The @admin.register() decorator performs the same
@@ -48,3 +48,10 @@ class PostAdmin(admin.ModelAdmin):
     # You can also see that the posts are ordered by STATUS and PUBLISH
     # - columns by default.
     ordering = ('status', 'publish')
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'post', 'created', 'active',)
+    list_filter = ('active', 'created', 'updated',)
+    search_fields = ('name', 'email', 'body',)
