@@ -1,4 +1,5 @@
 {% load static %}
+{% load blog_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,8 +20,24 @@
 
 {# Side Bar #}
 <div id="sidebar">
-    <h2>My blog</h2>
-    <p>This is my blog.</p>
+    <h2>Django Dubon Blog</h2>
+    {# Custom Template Tag: Total Number of Posts #}
+    <p>I've written {% total_posts %} posts so far.
+        {# Custom Template Tag: Latest Posts #}
+    <h4>Latest Posts</h4>
+    {% show_latest_posts 3 %}
+    <h4>Most Commented Posts</h4>
+    {# Custom Template Tag: Most Commented Posts #}
+    {% get_most_commented_posts as most_commented_posts %}
+    <ul>
+        {% for posts in most_commented_posts %}
+            <li>
+                <a href="{{ post.get_absolute_url }}">
+                    {{ post.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
 </div>
 
 </body>
