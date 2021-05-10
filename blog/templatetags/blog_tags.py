@@ -1,5 +1,8 @@
 from django import template
 from django.db.models import Count
+from django.utils.safestring import mark_safe
+import markdown
+
 from ..models import Post
 
 register = template.Library()
@@ -38,3 +41,14 @@ def show_latest_posts(count=5):
     return {
         'latest_posts': latest_posts
     }
+
+
+####
+# Register Template Filters
+####
+
+# A template filter to enable use of markdown .md syntax in blog posts and then converts
+# - post contents to HTML in the templates
+@register.filter(name='markdown')
+def markdown_format(text):
+    return mark_safe(markdown.markdown(text))
