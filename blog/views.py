@@ -2,7 +2,7 @@ from django.core.mail import send_mail
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
 from taggit.models import Tag
 
@@ -157,9 +157,14 @@ def post_search(request):
             query = form.cleaned_data['query']
             #  If the form is valid, you search for published posts with a custom
             #  - SearchVector instance built with the title and body fields.
+            search_vector = SearchVector('title', 'body')
+            # create a SearchQuery object, filter results by it, and use SearchRank to
+            # - order the results by relevancy.
+            search_query = SearchQuery(query)
             results = Post.published.annotate(
-                search=SearchVector('title', 'body'),
-            ).filter(search=query)
+                search=search_vector,
+                rank=SearchRank(search_vector, search_query)
+            ).filter(search=search_query).order_by('-rank')
     return render(request,
                   'blog/post/search.html',
                   {
