@@ -1,12 +1,13 @@
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
-from taggit.models import Tag
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
+from django.shortcuts import render, get_object_or_404
+from django.contrib.postgres.search import SearchVector
 
-from .models import Post, Comment
-from .forms import EmailPostForm, CommentForm
+from taggit.models import Tag
+
+from .forms import EmailPostForm, CommentForm, SearchForm
+from .models import Post
 
 
 # List posts view
@@ -135,3 +136,35 @@ def post_share(request, post_id):
         'form': form,
         'sent': sent
     })
+
+
+# 'Full Text' search form
+def post_search(request):
+    # Instantiate the SearchForm form
+    form = SearchForm()
+    query = None
+    results = []
+
+    # To check whether the form is submitted, you look for the query parameter
+    # - in the request.GET dictionary.
+    if 'query' in request.GET:
+        # send the form using the GET method instead of POST, so that the resulting
+        # - URL includes the query parameter and is easy to share.
+        form = SearchForm(request.GET)
+        # When the form is submitted, you instantiate it with the submitted GET data, and
+        # - verify that the form data is valid.
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            #  If the form is valid, you search for published posts with a custom
+            #  - SearchVector instance built with the title and body fields.
+            results = Post.published.annotate(
+                search=SearchVector('title', 'body'),
+            ).filter(search=query)
+    return render(request,
+                  'blog/post/search.html',
+                  {
+                      'form': form,
+                      'query': query,
+                      'results': results,
+                  }
+                  )
