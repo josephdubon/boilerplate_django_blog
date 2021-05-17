@@ -4,6 +4,8 @@ Dubon-Django-Blog is a Python/Django built 'simple blog app'.
 
 ## Features
 
+Main Functionality:
+
 - Sharing posts via email: When readers like an article, they might want to share it with somebody else.
 
 - Adding comments to a post: Many people want to allow their audience to comment on posts and create discussions.
@@ -13,17 +15,21 @@ Dubon-Django-Blog is a Python/Django built 'simple blog app'.
 - Recommending similar posts: Once you have a classification method in place, such as a tagging system, you can use it
   to provide content recommendations to your readers.
 
+Extras:
+
+- Custom Django template tags and filters to provide templates with a custom functionality.
+
+- Sitemap for search engines to crawl your site and an RSS feed for users to subscribe to your blog.
+
+- A search engine using the full-text search engine of PostgreSQL
+
 ## Usage
 
-TODO: Write usage
+- Create SuperUser
 
-```python
-import foobar
+- Run server
 
-foobar.pluralize('word')  # returns 'words'
-foobar.pluralize('goose')  # returns 'geese'
-foobar.singularize('phenomena')  # returns 'phenomenon'
-```
+- Go to Admin and start adding posts
 
 ## Contributing
 
