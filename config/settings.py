@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 
     'django.contrib.sites',  # To generate sitemap
     'django.contrib.sitemaps',  # To generate sitemap
+    'django.contrib.postgres',  # For search functionality
 
     'blog.apps.BlogConfig',  # Custom blog app
 
@@ -80,13 +81,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'blog',  # Database name
+        'USER': 'blog',  # Database Username
+        'PASSWORD': 'password',  # Database Username Password
     }
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
+# https±://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {

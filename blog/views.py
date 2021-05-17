@@ -1,12 +1,14 @@
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
-from taggit.models import Tag
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
+from django.shortcuts import render, get_object_or_404
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.contrib.postgres.search import TrigramSimilarity
 
-from .models import Post, Comment
-from .forms import EmailPostForm, CommentForm
+from taggit.models import Tag
+
+from .forms import EmailPostForm, CommentForm, SearchForm
+from .models import Post
 
 
 # List posts view
@@ -135,3 +137,52 @@ def post_share(request, post_id):
         'form': form,
         'sent': sent
     })
+
+
+# 'Full Text' search form
+def post_search(request):
+    # Instantiate the SearchForm form
+    form = SearchForm()
+    query = None
+    results = []
+
+    # To check whether the form is submitted, you look for the query parameter
+    # - in the request.GET dictionary.
+    if 'query' in request.GET:
+        # send the form using the GET method instead of POST, so that the resulting
+        # - URL includes the query parameter and is easy to share.
+        form = SearchForm(request.GET)
+        # When the form is submitted, you instantiate it with the submitted GET data, and
+        # - verify that the form data is valid.
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            #  If the form is valid, you search for published posts with a custom
+            #  - SearchVector instance built with the title and body fields.
+            # -- apply different weights to the search vectors built using the title and body fields
+            search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
+            # Create a SearchQuery object, filter results by it, and use SearchRank to
+            # - order the results by relevancy.
+            search_query = SearchQuery(query)
+            results = Post.published.annotate(
+                search=search_vector,
+                rank=SearchRank(search_vector, search_query)
+                # Filter the results to display only the ones with a rank higher than 0.3.
+            ).filter(rank__gte=0.3).order_by('-rank')
+
+            # Another search approach is trigram similarity. A trigram is a group of three consecutive characters.
+            # - You can measure the similarity of two strings by counting the number of trigrams that they share.
+            # - This approach turns out to be very effective for measuring the similarity of words in many languages.
+            # - Searching for 'yango' will give you 'django' results
+            # replace results fields with: #
+            # results = Post.published.annotate(
+            #     similarity=TrigramSimilarity('title', query),
+            # ).filter(similarity__gt=0.1).order_by('-similarity')
+
+    return render(request,
+                  'blog/post/search.html',
+                  {
+                      'form': form,
+                      'query': query,
+                      'results': results,
+                  }
+                  )
