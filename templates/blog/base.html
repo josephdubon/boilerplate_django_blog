@@ -24,9 +24,14 @@
     <h2><a href="{% url 'blog:post_list' %}">Django Dubon Blog Boilerplate</a></h2>
 
     {# Custom Template Tag: Total Number of Posts #}
-    <p>I've written {% total_posts %} posts so far.
+    <p>I've written {% total_posts %} posts so far.</p>
 
-        {# Custom Template Tag: Latest Posts #}
+    {# Feed Subsription Link #}
+    <p>
+        <a href="{% url "blog:post_feed" %}">Subscribe to my RSS feed.</a>
+    </p>
+
+    {# Custom Template Tag: Latest Posts #}
     <h4>Latest Posts</h4>
     {% show_latest_posts 3 %}
 
