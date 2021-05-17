@@ -2,6 +2,8 @@ from django.contrib.sitemaps import Sitemap
 from .models import Post
 
 
+# Open http://127.0.0.1:8000/admin/sites/site/ in your browser and update the site domain and display name.
+
 class PostSitemap(Sitemap):
     # The changefreq and priority attributes indicate the change frequency of your post
     # - pages and their relevance in your website (the maximum value is 1).
