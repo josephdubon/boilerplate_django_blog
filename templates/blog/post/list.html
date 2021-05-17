@@ -38,7 +38,7 @@
         {# 'truncatewords' truncates the value to the number of words specified #}
         {# 'linebreaks' converts the output into HTML line breaks #}
         {# TODO: Debug Markdown render #}
-        {{ post.body|markdown|truncatewords:30 }}
+        {{ post.body|markdown|truncatewords_html:30 }}
     {% endfor %}
 
     {# Add pagination here #}

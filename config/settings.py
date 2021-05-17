@@ -26,8 +26,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# Application definition
+SITE_ID = 1  # Define a new setting for the site ID
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -35,6 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'django.contrib.sites',  # To generate sitemap
+    'django.contrib.sitemaps',  # To generate sitemap
 
     'blog.apps.BlogConfig',  # Custom blog app
 
