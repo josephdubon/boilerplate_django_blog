@@ -157,14 +157,16 @@ def post_search(request):
             query = form.cleaned_data['query']
             #  If the form is valid, you search for published posts with a custom
             #  - SearchVector instance built with the title and body fields.
-            search_vector = SearchVector('title', 'body')
-            # create a SearchQuery object, filter results by it, and use SearchRank to
+            # -- apply different weights to the search vectors built using the title and body fields
+            search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
+            # Create a SearchQuery object, filter results by it, and use SearchRank to
             # - order the results by relevancy.
             search_query = SearchQuery(query)
             results = Post.published.annotate(
                 search=search_vector,
                 rank=SearchRank(search_vector, search_query)
-            ).filter(search=search_query).order_by('-rank')
+                # Filter the results to display only the ones with a rank higher than 0.3.
+            ).filter(rank__gte=0.3).order_by('-rank')
     return render(request,
                   'blog/post/search.html',
                   {
