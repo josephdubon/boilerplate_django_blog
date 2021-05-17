@@ -3,6 +3,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.contrib.postgres.search import TrigramSimilarity
 
 from taggit.models import Tag
 
@@ -167,6 +168,16 @@ def post_search(request):
                 rank=SearchRank(search_vector, search_query)
                 # Filter the results to display only the ones with a rank higher than 0.3.
             ).filter(rank__gte=0.3).order_by('-rank')
+
+            # Another search approach is trigram similarity. A trigram is a group of three consecutive characters.
+            # - You can measure the similarity of two strings by counting the number of trigrams that they share.
+            # - This approach turns out to be very effective for measuring the similarity of words in many languages.
+            # - Searching for 'yango' will give you 'django' results
+            # replace results fields with: #
+            # results = Post.published.annotate(
+            #     similarity=TrigramSimilarity('title', query),
+            # ).filter(similarity__gt=0.1).order_by('-similarity')
+
     return render(request,
                   'blog/post/search.html',
                   {
