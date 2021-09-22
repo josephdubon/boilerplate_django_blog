@@ -1,5 +1,5 @@
 asgiref==3.3.4
-Django==3.0.14
+Django==3.1.13
 django-taggit==1.4.0
 Markdown==3.3.4
 psycopg2-binary==2.8.6
